@@ -19,7 +19,7 @@ const audioPlayer = document.getElementById('audio-player')
 //     ctx.strokeStyle = "#ff0";
 //     ctx.stroke();
 // }
-    
+
 
 class TwoTris extends Field {
 
@@ -35,7 +35,7 @@ class TwoTris extends Field {
             if (this.dropHeight(this.piece) > 0) {
                 this.down()
             } else {
-                this.commit()
+                this.lock()
             }
             this.draw()
         }, 1000)
@@ -58,7 +58,7 @@ class TwoTris extends Field {
         }
         console.log([..."#".repeat(this.width)])
     }
-    
+
     draw() {
         fieldCtx.clearRect(0, 0, 100, 200)
         fieldCtx.beginPath()
@@ -66,14 +66,14 @@ class TwoTris extends Field {
             fieldCtx.moveTo(10 * x, 0);
             fieldCtx.lineTo(10 * x, 200);
         }
-    
+
         for (let y = 1; y < 20; y++) {
             fieldCtx.moveTo(0, 10 * y);
             fieldCtx.lineTo(100, 10 * y);
         }
         fieldCtx.strokeStyle = "#ff0";
         fieldCtx.stroke();
-    
+
         const visibleLines = this.lines.slice(2)
         for (const i in visibleLines) {
             const line = visibleLines[i]
@@ -85,7 +85,7 @@ class TwoTris extends Field {
                 }
             }
         }
-    
+
         pieceCtx.clearRect(0, 0, 40, 20)
         const piece = this.piece
         if (piece) {
@@ -98,7 +98,7 @@ class TwoTris extends Field {
                         pieceCtx.fillRect(10 * j, 10 * i, 10, 10)
                     }
                 }
-            }    
+            }
         }
     }
 
@@ -107,7 +107,7 @@ class TwoTris extends Field {
     down() { this.transform(0, 1) }
     cw() { this.transform(0, 0, 1) }
     ccw() { this.transform(0, 0, 3) }
-    drop() { this.commit() }
+    drop() { this.lock() }
 }
 
 
@@ -117,12 +117,14 @@ const game = new TwoTris()
 const keyMap = {
     'ArrowLeft': () => game.left(),
     'ArrowRight': () => game.right(),
-    'ArrowUp': () => game.cw(),
     'ArrowDown': () => game.down(),
+    'KeyX': () => game.cw(),
+    'ArrowUp': () => game.cw(),
+    'KeyZ': () => game.ccw(),
+    'ControlLeft': () => game.ccw(),
     'Space': () => game.drop(),
-    'KeyR': () => game.ccw(),
-    'KeyE': () => game.cw(),
     'Enter': () => game.pause(),
+    'Escape': () => game.pause(),
     'KeyQ': () => game.draw(),
 }
 

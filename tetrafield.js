@@ -74,7 +74,7 @@ class Field {
         }
     }
 
-    commit() {
+    lock() {
         console.assert(this.piece != null)
         this.transform(0, this.dropHeight(this.piece));
         this.lines = this.lines.filter(line => line.some(p => p == null))
@@ -90,22 +90,32 @@ class Field {
 
     transform(dx, dy, dr = 0) {
         const { piece, lines } = this
-        if (!piece) return
         let cells = piece.cells()
         cells.forEach(([x, y]) => lines[y][x] = null)
 
-        piece.x += dx
-        piece.y += dy
-        piece.r = (piece.r + dr) % 4 // HMM
+        const kicks = Tetramino[piece.type].kicks[this.piece.r][dr]?.map(
+            ([dx,dy]) => ({dx,dy,dr})
+        )
 
-        const nextCells = piece.cells()
-        if (!nextCells.every(cell => this.vacant(...cell))) {
-            piece.x -= dx
-            piece.y -= dy
-            piece.r = (piece.r + 4 - dr) % 4
-        } else {
-            cells = nextCells
+        const ts = [{ dx, dy, dr }, ...(kicks || [])]
+
+        for (const { dx, dy, dr } of ts) {
+
+            piece.x += dx
+            piece.y += dy
+            piece.r = (piece.r + dr) % 4 // HMM
+
+            const nextCells = piece.cells()
+            if (!nextCells.every(cell => this.vacant(...cell))) {
+                piece.x -= dx
+                piece.y -= dy
+                piece.r = (piece.r + 4 - dr) % 4
+            } else {
+                cells = nextCells
+                break;
+            }
         }
+
         cells.forEach(([x, y]) => lines[y][x] = piece)
     }
 }
